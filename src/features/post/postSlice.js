@@ -1,16 +1,7 @@
 const { createSlice, nanoid } = require("@reduxjs/toolkit");
 
 const initialState = [
-  // {
-  //   id: "1",
-  //   title: "first post",
-  //   content: "hello world"
-  // },
-  // {
-  //   id: "2",
-  //   title: "second post",
-  //   content: "hello world"
-  // }
+//
 ];
 
 const postSlice = createSlice({
@@ -24,9 +15,17 @@ const postSlice = createSlice({
       prepare: (userId, title, content) => ({
         payload: {
           userId,
+          date:new Date().toISOString(),
           id: nanoid().toString(),
           title,
-          content
+          content,
+          reactions:{
+            thumbsUp: 0,
+            hooray: 0,
+            heart: 0,
+            rocket: 0,
+            eyes: 0
+          }
         }
       })
     },
@@ -36,10 +35,17 @@ const postSlice = createSlice({
         post.title = payloadAction.payload.title;
         post.content = payloadAction.payload.content;
       }
+    },
+    reactionAdded:(state,payloadAction)=>{
+      const {postId,reaction}=payloadAction.payload;
+      const existingPost=state.find((post)=>post.id===postId);
+
+      if(existingPost)existingPost.reactions[reaction]++;
+
     }
   }
 });
 
-export const { postAdded, postUpdated } = postSlice.actions;
+export const { postAdded, postUpdated,reactionAdded } = postSlice.actions;
 
 export default postSlice.reducer;

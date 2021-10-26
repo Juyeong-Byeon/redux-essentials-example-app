@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import PostAuthor from "../user/PostAuthor";
 import React from "react";
+import ReactionButtons from './ReactionButtons';
 import { useSelector } from "react-redux";
 
 export default function PostPage({ match }) {
@@ -18,6 +19,7 @@ export default function PostPage({ match }) {
         <PostAuthor userId={post.userId} />
         <p className="post-content">{post.content}</p>
       </article>
+      <ReactionButtons post={post}/>
       <Link to={`/editpost/${postId}`} className="button">
         edit
       </Link>
