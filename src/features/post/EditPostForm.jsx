@@ -1,14 +1,12 @@
 import React, { useState } from "react";
+import { asyncPostAdd, postUpdated, selectPostById } from "./postSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { postUpdated } from "./postSlice";
 import { useHistory } from "react-router-dom";
 
 export default function EditPostForm({ match }) {
   const { postId } = match.params;
-  const post = useSelector(({ posts }) =>
-    posts.find((post) => post.id === postId)
-  );
+  const post = useSelector(selectPostById(postId));
   const dispatch = useDispatch();
   const history = useHistory();
   const [title, setTitle] = useState(post.title);
@@ -21,7 +19,7 @@ export default function EditPostForm({ match }) {
     if (!title || !content) return;
 
     dispatch(
-      postUpdated({
+      asyncPostAdd({
         id: postId,
         title,
         content

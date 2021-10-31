@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { postAdded } from "./postSlice";
+import { addNewPost } from "./postSlice";
 
 export default function AddPostForm() {
   const [title, setTitle] = useState("");
   const [content, setContnet] = useState("");
   const [userId, setUserId] = useState("");
+  const [addRequestStatus,setAddRequestStatus]=useState('idle');
 
   const onChangeTitle = (e) => setTitle(e.currentTarget.value);
   const onChangeContent = (e) => setContnet(e.currentTarget.value);
@@ -16,7 +17,23 @@ export default function AddPostForm() {
 
   const dispatch = useDispatch();
 
-  const cantSave = !title || !content || !userId;
+  const cantSave = !title || !content || !userId||addRequestStatus!=='idle';
+
+  const onSavePostClicked=async ()=>{
+    if (!cantSave){
+      try{
+        setAddRequestStatus('pending');
+        await dispatch(addNewPost({title,content,user:userId})).unwrap();
+          setTitle("");
+          setContnet("");
+          setUserId("");
+      }catch(error){
+        console.error(error);
+      }finally{
+        setAddRequestStatus('idle');
+      }
+    }
+  }
 
   return (
     <section>
@@ -33,8 +50,8 @@ export default function AddPostForm() {
         <label htmlFor="user">Author</label>
         <select name="user" id="user" value={userId} onChange={onChangeUserId}>
           <option value=""></option>
-          {users.map((user) => {
-            return <option value={user.id}>{user.name}</option>;
+          {users?.map((user) => {
+            return <option value={user?.id}>{user?.name}</option>;
           })}
         </select>
         <label htmlFor="content">contnet : </label>
@@ -49,12 +66,7 @@ export default function AddPostForm() {
         <button
           type="button"
           disabled={cantSave}
-          onClick={() => {
-            dispatch(postAdded(userId, title, content));
-            setTitle("");
-            setContnet("");
-            setUserId("");
-          }}
+          onClick={onSavePostClicked}
         >
           {" "}
           save
